@@ -483,7 +483,7 @@ class Query(QueryInstance):
         """
         return self._generate_test(
             lambda value: value in items,
-            ('one_of', self._path, freeze(items))
+            ('one_of', freeze(items))
         )
 
     def fragment(self, document: Mapping) -> QueryInstance:
