@@ -1,0 +1,5 @@
+- Implementer: change only `subtract` in tinydb/operations.py (`abs(n)` -> `n`). Do not touch `add`, `increment` or `decrement`.
+- Implementer: add `import pytest` to tests/test_operations.py for the TypeError test.
+- Tester: run the full tests/test_operations.py. test_subtract (positive 5, expects -4) must still pass.
+- Tester: AC-006 is a check of existing ops. Watch for float results and the order of the transforms.
+- Tester: the `db` fixture document is `{'char': 'a', 'int': 1}`, so use `int` as the field and `char == 'a'` as the query.
