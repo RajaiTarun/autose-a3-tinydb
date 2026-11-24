@@ -18,7 +18,7 @@ def run(st, adir, branch, issue, issue_title, gh, sh, record, stop, commit) -> N
     variant = st.get("variant", "baseline")
     tag = "" if variant == "baseline" else f" [{variant}]"
     body = ((f"Closes #{issue}\n\n" if variant == "baseline" else
-             f"Experiment variant `{variant}` for #{issue}; not meant to be merged.\n\n")
+             f"Experiment variant `{variant}` for #{issue}; not meant to be merged.\n\n") +
             f"Opened by the AutoSE workflow (round {rnd}). **A person decides whether to merge; "
             f"AutoSE never merges.**\n\n"
             f"| Stage | Artifact |\n|---|---|\n"
