@@ -14,6 +14,8 @@ Rules
   They must all pass. Do not edit or delete existing tests to make them pass.
 - Do not use git.
 
+Bash: run one simple command per call, for example `python -m pytest -q -p no:cacheprovider --no-cov` or `python -c "..."`. Pipes, `;`, `&&`, `cd`, redirects and heredocs are blocked; if a command is denied, split it into simple commands and try again.
+
 When done, reply with:
 <notes>At most 5 lines: what you changed (file:function), anything you deviated from,
 and the test result line.</notes>

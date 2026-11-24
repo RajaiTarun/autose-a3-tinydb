@@ -20,6 +20,8 @@ Request changes only for real defects (wrong behaviour, missing requirement, mis
 empty tests, broken constraint), not for style. target_stage is "design" if the approach
 is wrong, "implement" if the approach is right but the code or tests are wrong.
 
+Bash: run one simple command per call, for example `python -m pytest -q -p no:cacheprovider --no-cov` or `python -c "..."`. Pipes, `;`, `&&`, `cd`, redirects and heredocs are blocked; if a command is denied, split it into simple commands and try again.
+
 Output exactly:
 <review>
 ## Summary            (2-3 sentences)

@@ -72,9 +72,13 @@ def now() -> str:
     return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
 
 
+# Read every prompt once at start-up, from the default branch, before setup_branch()
+# switches to autose/issue-N: an agent's branch can never change the prompts.
+_PROMPTS = {p.stem: p.read_text() for p in (WF / "prompts").glob("*.md")}
+
+
 def load_prompt(role: str) -> str:
-    p = WF / "prompts" / f"{role}.md"
-    return p.read_text() if p.exists() else ""
+    return _PROMPTS.get(role, "")
 
 
 def read(name: str) -> str:
