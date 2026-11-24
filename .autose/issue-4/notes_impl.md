@@ -1,0 +1,4 @@
+- I changed `tinydb/queries.py`, `Query.one_of`. The hashval is now `('one_of', self._path, freeze(items))`.
+- I added `tests/test_autose_issue_4.py` with one test per AC, `test_ac001_` through `test_ac007_`. It has an unused `CachingMiddleware` import that I left in.
+- I made no deviations from the design.
+- Test result: 234 passed, 1 skipped.
