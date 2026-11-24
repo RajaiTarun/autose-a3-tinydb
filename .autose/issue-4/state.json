@@ -34,6 +34,16 @@
       "time": "2026-11-24T10:05:00+00:00",
       "tokens_in": 0,
       "tokens_out": 0
+    },
+    {
+      "stage": "test",
+      "round": 0,
+      "attempt": 1,
+      "passed": true,
+      "reason": "1 AC test(s) present; full suite passed.",
+      "time": "2026-11-24T10:05:04+00:00",
+      "tokens_in": 0,
+      "tokens_out": 0
     }
   ],
   "tokens_in": 0,
