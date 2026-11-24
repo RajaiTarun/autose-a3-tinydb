@@ -1,0 +1,25 @@
+{
+  "issue": "8",
+  "branch": "autose/issue-8",
+  "base_sha": "bf94cc6675d940faf34bad76b8b1466dee5d3cc3",
+  "variant": "baseline",
+  "status": "stopped",
+  "history": [
+    {
+      "stage": "spec",
+      "round": 0,
+      "attempt": 1,
+      "passed": false,
+      "reason": "needs clarification",
+      "time": "2026-11-24T14:02:01+00:00",
+      "tokens_in": 17966,
+      "tokens_out": 1598
+    }
+  ],
+  "tokens_in": 17966,
+  "tokens_out": 1598,
+  "dry_run": false,
+  "started": "2026-11-24T14:01:51+00:00",
+  "round": 0,
+  "stopped_reason": "spec: The request is too ambiguous to specify safely. Open questions are listed in spec.md; please answer them on the issue and re-run."
+}

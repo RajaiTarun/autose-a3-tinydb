@@ -1,0 +1,4 @@
+- tinydb/table.py:249-274: `search()` builds results by iterating `_read_table()` in storage order; no sort step exists.
+- tinydb/table.py:265-267: results come from `_query_cache`, so any sort must apply to cached results too, or it must be part of the cache key.
+- tinydb/table.py:348 and docs/usage.rst:398: the documented order is insertion order, which is the behaviour to keep as default.
+- No sort parameter exists in the current `search()` signature (tinydb/table.py:249).
