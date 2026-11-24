@@ -31,8 +31,52 @@ def run_agent(role: str, system_prompt: str, user_prompt: str, cwd: Path,
     return _run_real(role, cfg, system_prompt, user_prompt, cwd)
 
 
+def _base_tools(allowed: list[str]) -> list[str]:
+    """Built-in tools to expose: 'Bash(pytest:*)' -> 'Bash'. Nothing else exists for the agent."""
+    return sorted({t.split("(")[0] for t in allowed})
+
+
 def _run_real(role, cfg, system_prompt, user_prompt, cwd) -> AgentResult:
-    raise NotImplementedError("Real agents are wired in Phase 4 step 3.")
+    import anyio
+    from claude_agent_sdk import AssistantMessage, ClaudeAgentOptions, ResultMessage, TextBlock, query
+
+    options = ClaudeAgentOptions(
+        model=cfg["model"],
+        system_prompt=system_prompt,
+        tools=_base_tools(cfg["tools"]),   # the only tools that exist (ADR-005)
+        allowed_tools=cfg["tools"],        # e.g. Bash only as Bash(pytest:*)
+        permission_mode="dontAsk",         # anything not allowed is denied, never prompted
+        setting_sources=[],                # ignore any settings/CLAUDE.md files (isolation)
+        max_turns=cfg["max_turns"],        # ADR-009 budget
+        effort=cfg.get("effort"),
+        cwd=str(cwd),
+    )
+    texts: list[str] = []
+    result: ResultMessage | None = None
+
+    async def _go():
+        nonlocal result
+        async for msg in query(prompt=user_prompt, options=options):
+            if isinstance(msg, AssistantMessage):
+                texts.extend(b.text for b in msg.content if isinstance(b, TextBlock))
+            elif isinstance(msg, ResultMessage):
+                result = msg
+
+    anyio.run(_go)
+    u = (result.usage if result else None) or {}
+    tokens_in = sum(u.get(k, 0) or 0 for k in
+                    ("input_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"))
+    final = (result.result if result else None) or ""
+    # Tags may sit in an earlier message if the last turn was short: fall back to all text.
+    text = final if "<" in final else "\n".join(texts + [final])
+    error = None
+    if result is None or result.is_error:
+        error = getattr(result, "subtype", None) or "no result"
+        if not text.strip():           # auth, rate limit, outage: fail loudly, don't burn retries
+            raise RuntimeError(f"{role} agent failed: {error} "
+                               f"(api status {getattr(result, 'api_error_status', None)})")
+    return AgentResult(text, tokens_in, u.get("output_tokens", 0) or 0,
+                       getattr(result, "num_turns", 0) or 0, error)
 
 
 # --------------------------------------------------------------------------- stubs

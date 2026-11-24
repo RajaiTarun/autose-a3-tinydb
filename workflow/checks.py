@@ -6,6 +6,7 @@ import ast
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 AC_RE = re.compile(r"^\s*(?:[-*]\s*)?\**(AC-(\d+))\**\s*[:.)\-–]?\s*(.*)$", re.M)
@@ -92,8 +93,8 @@ def check_design(design: str, repo: Path) -> tuple[bool, str]:
 def check_build(repo: Path, diff: str) -> tuple[bool, str]:
     if not diff.strip():
         return False, "The implementation produced no code changes."
-    for cmd in (["python", "-m", "compileall", "-q", "tinydb"],
-                ["python", "-c", "import tinydb"]):
+    for cmd in ([sys.executable, "-m", "compileall", "-q", "tinydb"],
+                [sys.executable, "-c", "import tinydb"]):
         r = subprocess.run(cmd, cwd=repo, capture_output=True, text=True)
         if r.returncode:
             return False, f"`{' '.join(cmd)}` failed:\n{(r.stdout + r.stderr)[-1500:]}"
@@ -106,7 +107,7 @@ def check_tests(repo: Path, issue: str, ac_ids: list[str]) -> tuple[bool, str, s
     src = "\n".join(f.read_text() for f in files)
     missing = [a for a in ac_ids
                if not re.search(rf"def test_{a.lower().replace('-', '')}_", src)]
-    r = subprocess.run(["python", "-m", "pytest", "-q", "-p", "no:cacheprovider", "--no-cov"],
+    r = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", "--no-cov"],
                        cwd=repo, capture_output=True, text=True)
     out = (r.stdout + r.stderr)[-4000:]
     if not files:
