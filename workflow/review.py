@@ -51,7 +51,7 @@ def strip_autose(diff: str) -> str:
 
 
 def request_text(pr: dict) -> str:
-    m = re.match(r"autose/issue-(\d+)$", pr["headRefName"])
+    m = re.match(r"autose/issue-(\d+)(?:-[\w-]+)?$", pr["headRefName"])
     if m:   # AutoSE PR: review against the original issue, never the PR body (pr.md)
         issue = json.loads(gh("issue", "view", m.group(1), "--json", "title,body"))
         title, body = issue["title"], issue["body"]
@@ -117,7 +117,7 @@ def main() -> None:
     # The bot opened this PR, so GitHub forbids APPROVE/REQUEST_CHANGES from it: post a COMMENT review.
     gh("pr", "review", PR, "--comment", "--body-file", "review.md")
 
-    issue = re.match(r"autose/issue-(\d+)$", pr["headRefName"])
+    issue = re.match(r"autose/issue-(\d+)(?:-[\w-]+)?$", pr["headRefName"])
     if MODE == "build" and issue and verdict == "changes_requested" and ROUND < MAX_REVIEW_ROUNDS:
         gh("workflow", "run", "autose.yml", "-f", f"issue={issue.group(1)}",
            "-f", f"start_stage={v['target_stage']}", "-f", f"round={ROUND + 1}",
