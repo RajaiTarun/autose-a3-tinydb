@@ -9,7 +9,7 @@ SONNET = "claude-sonnet-5-5"
 
 READ_ONLY = ["Read", "Grep", "Glob"]
 EDIT = ["Edit", "Write"]
-RUN_TESTS = ["Bash(pytest:*)", "Bash(python -m pytest:*)", "Bash(python:*)"]
+RUN_TESTS = ["Bash(pytest:*)", "Bash(python -m pytest:*)", "Bash(python:*)", "Bash(python3:*)"]
 
 ROLES = {
     #  role         model    tools                         max_turns
@@ -20,7 +20,7 @@ ROLES = {
                   "effort": "medium"},   # Sonnet defaults to high; medium saves usage
     "test":      {"model": HAIKU,  "tools": READ_ONLY + EDIT + RUN_TESTS,  "max_turns": 20},
     "review":    {"model": HAIKU,  "tools": READ_ONLY + ["Bash(pytest:*)", "Bash(python -m pytest:*)",
-                                                "Bash(python -c:*)"],   # quick checks, read-only checkout
+                                                "Bash(python -c:*)", "Bash(python3 -c:*)"],   # quick checks, read-only checkout
                   "max_turns": 15},
 }
 
