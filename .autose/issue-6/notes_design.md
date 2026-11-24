@@ -1,0 +1,5 @@
+- Change only `tinydb/queries.py`: add `Query.between` after `__ge__`. Do not edit `tinydb/table.py`.
+- `between` must guard the TypeError inside its own `test` function. `_generate_test` does not catch errors from `test(value)`.
+- The hashval must be `('between', self._path, freeze(low), freeze(high))`. Include both bounds.
+- Tests: check AC-001 to AC-008, including the cache case AC-006 (`between(18,65)` then `between(18,30)` on one table).
+- Existing `>=`/`<=` tests must pass unchanged (AC-008).
