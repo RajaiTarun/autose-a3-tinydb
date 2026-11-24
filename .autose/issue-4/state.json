@@ -3,7 +3,7 @@
   "branch": "autose/issue-4",
   "base_sha": "195fc07aefd881c5dcfa1a567b0217014b11b45d",
   "variant": "baseline",
-  "status": "stopped",
+  "status": "running",
   "history": [
     {
       "stage": "spec",
@@ -24,10 +24,20 @@
       "time": "2026-11-24T11:46:32+00:00",
       "tokens_in": 24396,
       "tokens_out": 3985
+    },
+    {
+      "stage": "spec",
+      "round": 0,
+      "attempt": 1,
+      "passed": true,
+      "reason": "6 ACs, all Given/When/Then, judged testable.",
+      "time": "2026-11-24T11:49:35+00:00",
+      "tokens_in": 20474,
+      "tokens_out": 2703
     }
   ],
-  "tokens_in": 43205,
-  "tokens_out": 6372,
+  "tokens_in": 63679,
+  "tokens_out": 9075,
   "dry_run": false,
   "started": "2026-11-24T11:45:54+00:00",
   "round": 0,
