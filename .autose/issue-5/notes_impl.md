@@ -1,0 +1,4 @@
+- tinydb/operations.py:subtract now does `doc[field] -= n` instead of `abs(n)`. I also fixed the docstring wording ("from") and noted that a negative `n` increases the field.
+- I added tests/test_autose_issue_5.py with one test per AC, `test_ac001` to `test_ac006`.
+- I did not add the extra tests to tests/test_operations.py or `import pytest` there. The task asked for tests in the new file only.
+- Tests: 233 passed, 1 skipped.
