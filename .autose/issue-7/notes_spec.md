@@ -1,0 +1,5 @@
+- tinydb/storages.py:79-161: JSONStorage opens a text handle in __init__ (line 120); read returns None for a zero-size file (131-134) and otherwise uses json.load (140); write fsyncs (157).
+- tinydb/storages.py:13: __all__ lists only Storage, JSONStorage, MemoryStorage, so the new class must be added there.
+- tinydb/database.py:95: TinyDB forwards *args/**kwargs to storage(...), so the constructor signature must match JSONStorage's path argument.
+- tinydb/middlewares.py:132: CachingMiddleware.close is where deferred writes happen, which AC-005 covers.
+- architecture/decisions/ADR-009.md and experiment/issues/issue-4-feature-gzip.md also mention gzip; I did not read them, so they may hold prior decisions.

@@ -1,0 +1,5 @@
+- I added `GzipJSONStorage(Storage)` to `tinydb/storages.py`, after `MemoryStorage`. I also added `import gzip` and put the class in `__all__`.
+- `__init__` calls `touch()`. `read` returns `None` for a zero-byte file and otherwise reads through `gzip.open`. `write` goes through `GzipFile` on a raw `'wb'` handle, then flushes and fsyncs it. I did not override `close`.
+- I didn't deviate from the design.
+- I didn't add tests or run the AC scenarios directly.
+- Tests: 227 passed, 1 skipped.

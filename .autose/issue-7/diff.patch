@@ -1,0 +1,65 @@
+diff --git a/tinydb/storages.py b/tinydb/storages.py
+index 59337a1..b80273c 100644
+--- a/tinydb/storages.py
++++ b/tinydb/storages.py
+@@ -3,6 +3,7 @@ Contains the :class:`base class <tinydb.storages.Storage>` for storages and
+ implementations.
+ """
+ 
++import gzip
+ import io
+ import json
+ import os
+@@ -10,7 +11,7 @@ import warnings
+ from abc import ABC, abstractmethod
+ from typing import Any, Optional
+ 
+-__all__ = ('Storage', 'JSONStorage', 'MemoryStorage')
++__all__ = ('Storage', 'JSONStorage', 'MemoryStorage', 'GzipJSONStorage')
+ 
+ 
+ def touch(path: str, create_dirs: bool):
+@@ -179,3 +180,43 @@ class MemoryStorage(Storage):
+ 
+     def write(self, data: dict[str, dict[str, Any]]):
+         self.memory = data
++
++
++class GzipJSONStorage(Storage):
++    """
++    Store the data as gzip-compressed JSON in a file.
++    """
++
++    def __init__(self, path: str, create_dirs=False, **kwargs):
++        """
++        Create a new instance.
++
++        Also creates the storage file, if it doesn't exist yet.
++
++        :param path: Where to store the compressed JSON data.
++        :param create_dirs: Whether to create missing parent directories.
++        """
++
++        super().__init__()
++
++        self._path = path
++        self.kwargs = kwargs
++
++        touch(path, create_dirs=create_dirs)
++
++    def read(self) -> Optional[dict[str, dict[str, Any]]]:
++        if os.path.getsize(self._path) == 0:
++            return None
++
++        with gzip.open(self._path, 'rt', encoding='utf-8') as f:
++            return json.load(f)
++
++    def write(self, data: dict[str, dict[str, Any]]):
++        serialized = json.dumps(data, **self.kwargs).encode('utf-8')
++
++        with open(self._path, 'wb') as raw:
++            with gzip.GzipFile(fileobj=raw, mode='wb') as gz:
++                gz.write(serialized)
++
++            raw.flush()
++            os.fsync(raw.fileno())
