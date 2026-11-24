@@ -10,7 +10,7 @@ This would delete the ``foo`` field from all documents where ``foo`` equals 2.
 
 
 from collections.abc import Callable, MutableMapping
-from typing import Any, Union
+from typing import Any, Any, Union
 
 
 def delete(field: str) -> Callable[[MutableMapping], None]:
@@ -31,6 +31,22 @@ def add(field: str, n: Union[int, float, str]) -> Callable[[MutableMapping], Non
     """
     def transform(doc: MutableMapping):
         doc[field] += n
+
+    return transform
+
+
+def append(field: str, value: Any) -> Callable[[MutableMapping], None]:
+    """
+    Append a value to the list in a given field.
+
+    If the document has no such field, it is created as a list first.
+    """
+    new_list: list = []
+
+    def transform(doc: MutableMapping):
+        if field not in doc:
+            doc[field] = new_list
+        doc[field].append(value)
 
     return transform
 

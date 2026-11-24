@@ -1,5 +1,5 @@
 from tinydb import where
-from tinydb.operations import delete, increment, decrement, add, subtract, set
+from tinydb.operations import delete, increment, decrement, add, subtract, set, append
 
 
 def test_delete(db):
@@ -35,3 +35,14 @@ def test_increment(db):
 def test_decrement(db):
     db.update(decrement('int'), where('char') == 'a')
     assert db.get(where('char') == 'a')['int'] == 0
+
+
+def test_append(db):
+    db.update({'tags': ['a']}, where('char') == 'a')
+    db.update(append('tags', 'b'), where('char') == 'a')
+    assert db.get(where('char') == 'a')['tags'] == ['a', 'b']
+
+
+def test_append_creates_list(db):
+    db.update(append('tags', 'x'), where('char') == 'b')
+    assert db.get(where('char') == 'b')['tags'] == ['x']
