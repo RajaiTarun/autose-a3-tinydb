@@ -3,7 +3,7 @@
   "branch": "autose/issue-4-no_tester",
   "base_sha": "436445dce2a3ea2152a0ae7723649284c1932441",
   "variant": "no_tester",
-  "status": "running",
+  "status": "ci_pending",
   "history": [
     {
       "stage": "spec",
