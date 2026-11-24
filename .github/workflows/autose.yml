@@ -131,23 +131,30 @@ jobs:
       MODE: ${{ needs.gate.outputs.mode }}
       AUTOSE_DRY_RUN: ${{ vars.AUTOSE_DRY_RUN || 'true' }}
     steps:
+      - uses: actions/checkout@v4         # workflow code and prompts from the default branch, never from the PR
+        with:
+          path: base
+          fetch-depth: 1
+          persist-credentials: false
       - uses: actions/checkout@v4         # fresh shallow checkout of the PR head; nothing from build
         with:
           ref: refs/pull/${{ needs.build.outputs.pr || needs.gate.outputs.issue }}/head
+          path: pr
           fetch-depth: 1
           persist-credentials: false
       - uses: actions/setup-python@v5
         with: { python-version: "3.13" }
-      - run: pip install -q -e . pytest pytest-cov claude-agent-sdk
+      - run: pip install -q -e ./pr pytest pytest-cov claude-agent-sdk
       - name: Reviewer
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           GH_TOKEN: ${{ github.token }}    # removed from the agent's env by review.py
           ROUND: ${{ inputs.round || '0' }}
           VARIANT: ${{ needs.gate.outputs.variant || inputs.variant || 'baseline' }}
-        run: python workflow/review.py
+        working-directory: pr
+        run: python ../base/workflow/review.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: autose-pr-${{ needs.build.outputs.pr || needs.gate.outputs.issue }}-round-${{ inputs.round || '0' }}-${{ needs.gate.outputs.variant || inputs.variant || 'baseline' }}-review
-          path: review.md
+          path: pr/review.md

@@ -14,5 +14,7 @@ Rules
 - Do not edit any file under tinydb/ or any existing test.
 - Run: python -m pytest -q -p no:cacheprovider --no-cov tests/test_autose_issue_<ISSUE>.py
 
+Bash: run one simple command per call, for example `python -m pytest -q -p no:cacheprovider --no-cov` or `python -c "..."`. Pipes, `;`, `&&`, `cd`, redirects and heredocs are blocked; if a command is denied, split it into simple commands and try again.
+
 When done, reply with:
 <notes>At most 5 lines: the AC -> test mapping and the result line.</notes>
