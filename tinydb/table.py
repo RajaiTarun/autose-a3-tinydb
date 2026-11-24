@@ -706,6 +706,24 @@ class Table:
         # Reset document ID counter
         self._next_id = None
 
+    def page(self, number: int, size: int = 10) -> list[Document]:
+        """
+        Get one page of documents, in insertion order.
+
+        The last page may contain fewer than ``size`` documents.
+
+        :param number: the page number, starting at 1
+        :param size: the number of documents per page
+        """
+        if number < 1 or size < 1:
+            raise ValueError('number and size must be positive')
+
+        docs = self.all()
+        start = (number - 1) * size
+        end = min(start + size, len(docs) - 1)
+
+        return docs[start:end]
+
     def count(self, cond: QueryLike) -> int:
         """
         Count the documents matching a query.

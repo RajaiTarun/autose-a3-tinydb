@@ -197,3 +197,15 @@ def test_persist_empty_does_not_wipe_existing_data(tmpdir):
     assert len(table) == 1
     assert table.all() == [{'a': 1}]
     db.close()
+
+
+def test_page(db):
+    db.truncate()
+    db.insert_multiple({'i': i} for i in range(25))
+
+    assert [d['i'] for d in db.page(1, size=10)] == list(range(10))
+    assert [d['i'] for d in db.page(2, size=10)] == list(range(10, 20))
+    assert db.page(9, size=10) == []
+
+    with pytest.raises(ValueError):
+        db.page(0)
