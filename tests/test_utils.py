@@ -159,3 +159,12 @@ def test_freeze():
 
     with pytest.raises(TypeError):
         frozen[3].update({'a': 9})
+
+
+def test_lru_cache_get():
+    cache = LRUCache(capacity=3)
+    cache["a"] = 1
+
+    assert cache.get("a") == 1
+    assert cache.get("missing") is None
+    assert cache.get("missing", 5) == 5

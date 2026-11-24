@@ -94,14 +94,8 @@ class LRUCache(abc.MutableMapping, Generic[K, V]):
         return iter(self.cache)
 
     def get(self, key: K, default: Optional[D] = None) -> Optional[Union[V, D]]:
-        value = self.cache.get(key, _missing)
-
-        if value is not _missing:
-            self.cache.move_to_end(key, last=True)
-
-            return cast(V, value)
-
-        return default
+        # OrderedDict.get already returns the default for missing keys.
+        return cast(Optional[Union[V, D]], self.cache.get(key, default))
 
     def set(self, key: K, value: V):
         if key in self.cache:
