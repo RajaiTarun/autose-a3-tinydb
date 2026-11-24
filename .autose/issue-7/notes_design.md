@@ -1,0 +1,5 @@
+- Implementer: add `GzipJSONStorage` after `MemoryStorage` in tinydb/storages.py. Subclass `Storage` directly, not `JSONStorage`.
+- Implementer: add `'GzipJSONStorage'` to `__all__` at storages.py:13 and add `import gzip`. Do not edit `JSONStorage`, `MemoryStorage`, or middlewares.py.
+- Implementer: `write` must fsync the raw file descriptor, matching `JSONStorage.write`.
+- Tester: AC-004 needs the first two raw bytes to be `b'\x1f\x8b'`. AC-005 needs a `CachingMiddleware(GzipJSONStorage)` close followed by a plain reopen.
+- Tester: run the existing `JSONStorage` and `MemoryStorage` tests unchanged to confirm FR-6.
