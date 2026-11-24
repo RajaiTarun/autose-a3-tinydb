@@ -329,6 +329,28 @@ class Query(QueryInstance):
             ('>=', self._path, rhs)
         )
 
+    def between(self, low: Any, high: Any) -> QueryInstance:
+        """
+        Test a dict value for being in the inclusive range [low, high].
+
+        Missing fields and values that cannot be compared do not match.
+
+        >>> Query().f1.between(18, 65)
+
+        :param low: The lower bound (inclusive)
+        :param high: The upper bound (inclusive)
+        """
+        def test(value):
+            try:
+                return low <= value <= high
+            except TypeError:
+                return False
+
+        return self._generate_test(
+            test,
+            ('between', self._path, freeze(low), freeze(high))
+        )
+
     def exists(self) -> QueryInstance:
         """
         Test for a dict where a provided key exists.

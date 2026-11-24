@@ -1,0 +1,5 @@
+- queries.py:243-247: `_generate_test`'s runner only catches KeyError/TypeError while resolving the path; the test itself is not guarded, so an exception from `test(value)` propagates.
+- queries.py:280-330: `__lt__/__le__/__gt__/__ge__` compare without any guard, so `Query().age >= 18` on `{'age': 'x'}` raises TypeError. `between` must catch this inside its own test function.
+- queries.py:254-330: each operator builds its cache key from `self._path` and the raw/frozen rhs (e.g. `('>=', self._path, rhs)`); `between` should follow the same pattern with both bounds in the hashval (use `freeze` as `__eq__` does at line 264).
+- queries.py:193-205: `__getattr__` only fires for missing attributes, so a new method named `between` shadows a document field called `between`, the same as existing methods (`matches`, `search`, `test`).
+- table.py:249 (search), 625 (remove), 709 (count) exist; `get` is at table.py:303-337.
