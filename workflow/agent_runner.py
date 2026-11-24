@@ -71,6 +71,8 @@ def _run_real(role, cfg, system_prompt, user_prompt, cwd) -> AgentResult:
     # (the model wrote the blocks, then a short "done"), use all text instead.
     joined = "\n".join(texts)
     text = joined if ("<" not in final and "<" in joined) or not final.strip() else final
+    for d in (getattr(result, "permission_denials", None) or []):   # visible in the job log
+        print(f"[{role}] tool call denied: {str(d)[:300]}")
     error = None
     if result is None or result.is_error:
         error = getattr(result, "subtype", None) or "no result"

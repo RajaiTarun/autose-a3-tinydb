@@ -90,7 +90,9 @@ def main() -> None:
     pr = json.loads(gh("pr", "view", PR, "--json", "title,body,headRefName"))
     diff = strip_autose(gh("pr", "diff", PR))
     prompt = (f"{request_text(pr)}\n\n<pr_diff>\n{diff}\n</pr_diff>\n\n"
-              f"The repository is checked out at the PR head. Checklist: {', '.join(CHECKLIST)}.")
+              f"The repository is checked out at the PR head. The .autose/ folder was removed on "
+              f"purpose before your review (it shows as deleted in git status); ignore it. "
+              f"Checklist: {', '.join(CHECKLIST)}.")
     v, problem = None, ""
     for _ in range(2):                                         # one retry if invalid
         res = run_agent("review", (Path(__file__).parent / "prompts" / "review.md").read_text()
