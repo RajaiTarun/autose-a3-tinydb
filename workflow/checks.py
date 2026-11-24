@@ -81,9 +81,12 @@ def check_design(design: str, repo: Path) -> tuple[bool, str]:
                 problems.append(f"{file} does not exist and is not marked NEW")
             continue
         if symbol and symbol != "NEW" and not is_new:
-            sym = symbol.split("(")[0].strip()
-            if sym not in _symbols(p):
-                problems.append(f"{file}: {sym} not found")
+            # A cell may list several names: `Table.search`, `Table.get` and `Table.count`
+            known = _symbols(p)
+            for part in re.split(r",|/|\band\b", symbol):
+                sym = part.split("(")[0].strip(" `")
+                if sym and sym not in known:
+                    problems.append(f"{file}: {sym} not found")
     if problems:
         return False, "; ".join(problems)
     return True, f"{len(rows)} change(s); every file/function exists or is marked NEW."
