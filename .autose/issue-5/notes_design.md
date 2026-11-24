@@ -1,0 +1,4 @@
+- Only change in source: tinydb/operations.py `subtract`, delete `abs(...)` and use `-= n`. Do not touch other operations or the docstring.
+- Add three new tests to tests/test_operations.py: negative int (AC-001), negative float (AC-002), zero (AC-004). Keep `test_subtract` as it is.
+- Expected values: `int`=1 with `subtract(-10)` gives 11; float 100 with `subtract(-2.5)` gives 102.5; zero leaves the value unchanged.
+- Run the full test suite, not just tests/test_operations.py, to check that no other test depends on the old `abs` behaviour.

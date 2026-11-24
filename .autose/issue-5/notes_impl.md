@@ -1,0 +1,3 @@
+- `tinydb/operations.py:subtract`: `doc[field] -= abs(n)` is now `doc[field] -= n`.
+- `tests/test_operations.py`: added `test_subtract_negative_int`, `test_subtract_negative_float` and `test_subtract_zero`. The float test sets `int` to 100 first, then subtracts -2.5.
+- I couldn't run the test suite. Bash was denied in this environment, so the result line is not available. Please run `python -m pytest -q -p no:cacheprovider --no-cov`.
