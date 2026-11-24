@@ -1,0 +1,5 @@
+- tinydb/operations.py:43: `doc[field] -= abs(n)` is the root cause; the sign of `n` is discarded.
+- tinydb/operations.py:33: `add` uses `doc[field] += n` (sign preserved), so the fix can mirror it.
+- tinydb/operations.py:38: signature is `Union[int, float]`; `abs()` on a str raises TypeError, which AC-005 pins.
+- docs/usage.rst:316: documents `subtract(key, value)` as "subtract value from the value of a key".
+- tests/test_operations.py:20-21: existing `test_subtract` uses `subtract('int', 5)`; it must still pass.
