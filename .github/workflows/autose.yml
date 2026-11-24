@@ -33,6 +33,7 @@ jobs:
       go: ${{ steps.check.outputs.go }}
       mode: ${{ steps.check.outputs.mode }}
       issue: ${{ steps.check.outputs.issue }}
+      variant: ${{ steps.check.outputs.variant }}
     steps:
       - id: check
         env:                    # untrusted text only via env, never ${{ }} inside run (ADR-009)
@@ -47,6 +48,7 @@ jobs:
           go=false
           mode=build
           trusted=no
+          variant=
           case "$ASSOC" in OWNER|MEMBER|COLLABORATOR) trusted=yes;; esac
           [ "$SENDER_TYPE" = "Bot" ] && trusted=no
           if [ "$EVENT" = "workflow_dispatch" ]; then
@@ -59,11 +61,15 @@ jobs:
           elif [ "$EVENT" = "issue_comment" ] && [ "$IS_PR" = yes ] && [ "$trusted" = yes ] \
                && printf '%s' "$BODY" | head -1 | grep -qE '^/autose review(\s|$)'; then
             go=true; mode=review                      # Reviewer only, on this PR (ADR-010 amendment)
+            # Optional variant word: "/autose review reviewer_sonnet" (allowlist only, experiment A)
+            word=$(printf '%s' "$BODY" | head -1 | awk '{print $3}')
+            case "$word" in baseline|reviewer_sonnet) variant=$word;; esac
           fi
           echo "event=$EVENT assoc=$ASSOC sender=$SENDER_TYPE -> go=$go mode=$mode"
           echo "go=$go" >> "$GITHUB_OUTPUT"
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
           echo "issue=$ISSUE_NUM" >> "$GITHUB_OUTPUT"
+          echo "variant=$variant" >> "$GITHUB_OUTPUT"
 
   build:                        # stages 1-5 (ADR-001, ADR-002)
     needs: gate
@@ -138,10 +144,10 @@ jobs:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           GH_TOKEN: ${{ github.token }}    # removed from the agent's env by review.py
           ROUND: ${{ inputs.round || '0' }}
-          VARIANT: ${{ inputs.variant || 'baseline' }}
+          VARIANT: ${{ needs.gate.outputs.variant || inputs.variant || 'baseline' }}
         run: python workflow/review.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: autose-pr-${{ needs.build.outputs.pr || needs.gate.outputs.issue }}-round-${{ inputs.round || '0' }}-review
+          name: autose-pr-${{ needs.build.outputs.pr || needs.gate.outputs.issue }}-round-${{ inputs.round || '0' }}-${{ needs.gate.outputs.variant || inputs.variant || 'baseline' }}-review
           path: review.md
