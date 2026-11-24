@@ -486,6 +486,19 @@ class Query(QueryInstance):
             ('one_of', freeze(items))
         )
 
+    def not_one_of(self, items: list[Any]) -> QueryInstance:
+        """
+        Check if the value is not contained in a list or generator.
+
+        >>> Query().f1.not_one_of(['value 1', 'value 2'])
+
+        :param items: The list of items to check with
+        """
+        return self._generate_test(
+            lambda value: value not in items,
+            ('not_one_of', freeze(items))
+        )
+
     def fragment(self, document: Mapping) -> QueryInstance:
         def test(value):
             for key in document:
