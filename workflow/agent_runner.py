@@ -63,7 +63,8 @@ def _stub_implement(prompt, cwd):
 def _stub_test(prompt, cwd):
     issue = os.environ.get("ISSUE", "0")
     (Path(cwd) / "tests" / f"test_autose_issue_{issue}.py").write_text(
-        "def test_ac001_dry_run():\n    assert True\n")
+        "def test_ac001_dry_run():\n    assert %s\n"
+        % ("False" if os.environ.get("AUTOSE_STUB_FAIL") == "test" else "True"))
     return AgentResult("Wrote one test per AC.")
 
 
