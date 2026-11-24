@@ -1,0 +1,75 @@
+{
+  "issue": "4",
+  "branch": "autose/issue-4",
+  "base_sha": "195fc07aefd881c5dcfa1a567b0217014b11b45d",
+  "variant": "baseline",
+  "status": "ci_pending",
+  "history": [
+    {
+      "stage": "spec",
+      "round": 0,
+      "attempt": 1,
+      "passed": false,
+      "reason": "Judge returned unparseable output: {\"testable\": false, \"problems\": [\"AC-005: 'Given a table with {'a': 1, 'b': 1} and {'c': 1}' is ambiguous about what the 'When' query returns for the 'c' document; the expectation is stated only for t",
+      "time": "2026-11-24T11:46:11+00:00",
+      "tokens_in": 18809,
+      "tokens_out": 2387
+    },
+    {
+      "stage": "spec",
+      "round": 0,
+      "attempt": 2,
+      "passed": false,
+      "reason": "Judge returned unparseable output: {\"testable\": true, \"problems\": []}\n{\"testable\": true, \"problems\": []}",
+      "time": "2026-11-24T11:46:32+00:00",
+      "tokens_in": 24396,
+      "tokens_out": 3985
+    },
+    {
+      "stage": "spec",
+      "round": 0,
+      "attempt": 1,
+      "passed": true,
+      "reason": "6 ACs, all Given/When/Then, judged testable.",
+      "time": "2026-11-24T11:49:35+00:00",
+      "tokens_in": 20474,
+      "tokens_out": 2703
+    },
+    {
+      "stage": "design",
+      "round": 0,
+      "attempt": 1,
+      "passed": true,
+      "reason": "3 change(s); every file/function exists or is marked NEW.",
+      "time": "2026-11-24T11:49:48+00:00",
+      "tokens_in": 16906,
+      "tokens_out": 2166
+    },
+    {
+      "stage": "implement",
+      "round": 0,
+      "attempt": 1,
+      "passed": true,
+      "reason": "Code compiles and tinydb imports.",
+      "time": "2026-11-24T11:50:00+00:00",
+      "tokens_in": 26415,
+      "tokens_out": 526
+    },
+    {
+      "stage": "test",
+      "round": 0,
+      "attempt": 1,
+      "passed": true,
+      "reason": "6 AC test(s) present; full suite passed.",
+      "time": "2026-11-24T11:50:12+00:00",
+      "tokens_in": 31068,
+      "tokens_out": 1928
+    }
+  ],
+  "tokens_in": 138068,
+  "tokens_out": 13695,
+  "dry_run": false,
+  "started": "2026-11-24T11:45:54+00:00",
+  "round": 0,
+  "stopped_reason": "spec: Judge returned unparseable output: {\"testable\": true, \"problems\": []}\n{\"testable\": true, \"problems\": []}"
+}

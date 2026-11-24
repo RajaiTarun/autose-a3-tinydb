@@ -1,0 +1,5 @@
+- tinydb/queries.py:484-487: `one_of` hashes as `('one_of', freeze(items))`, with no `self._path`. This is the bug.
+- tinydb/queries.py:264 (`==`) hashes as `('==', self._path, freeze(rhs))`. This is the correct pattern to match.
+- tinydb/queries.py:203 and 249-252: `_generate_test` stores the hash on the QueryInstance only when the query is cacheable.
+- tinydb/table.py:265 and 291-295: the search cache is an LRU keyed on the query object, and equality is by `_hash` (queries.py:110).
+- tests/test_queries.py:428 `test_one_of` covers one field only, so it cannot catch this collision.

@@ -1,0 +1,3 @@
+- I changed the hash tuple in `tinydb/queries.py` `Query.one_of` (line 486) to `('one_of', self._path, freeze(items))`.
+- I made no other changes. The predicate, `_generate_test` and `fragment` are untouched, and I added no tests.
+- Test result: 227 passed, 1 skipped.

@@ -1,0 +1,5 @@
+- Implementer: change only the hash tuple at tinydb/queries.py:486. Do not touch the predicate or `_generate_test`. Do not change `fragment` (out of scope).
+- Tester: the one-field `test_one_of` cannot catch the bug. Add a two-field case and a same-field, two-list case. Each must go through `db.search` with a shared query cache, so run the first query, then the second, in one table.
+- Tester: for AC-006, a `one_of` search that returns `[]` must be repeated after `insert`. Repeating it verifies that `_update_table` clears the cache.
+- Tester: run the full `tests/` suite to catch any test that depends on the hash tuple shape.
+- Both: the example in the issue (`{'a': 1, 'b': 9}`) is the minimal reproduction.
