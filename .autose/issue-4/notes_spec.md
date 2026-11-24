@@ -1,0 +1,5 @@
+- tinydb/queries.py:484-487: `one_of` builds its hash as `('one_of', freeze(items))`, omitting `self._path`. This is the bug.
+- tinydb/queries.py:264 (`==`) hashes as `('==', self._path, freeze(rhs))`, which includes the path, so it does not collide.
+- tinydb/queries.py:203 and 218-245: path is part of the test, but `_generate_test` only sets the hash from the caller-supplied `hashval`.
+- tinydb/table.py:265 and 295: `search` looks up and stores results in `_query_cache` keyed by the query object, so equal hashes return stale results.
+- Likely fix: include `self._path` in the `one_of` hashval, as `==` does.
