@@ -54,10 +54,20 @@
       "time": "2026-11-24T11:50:00+00:00",
       "tokens_in": 26415,
       "tokens_out": 526
+    },
+    {
+      "stage": "test",
+      "round": 0,
+      "attempt": 1,
+      "passed": true,
+      "reason": "6 AC test(s) present; full suite passed.",
+      "time": "2026-11-24T11:50:12+00:00",
+      "tokens_in": 31068,
+      "tokens_out": 1928
     }
   ],
-  "tokens_in": 107000,
-  "tokens_out": 11767,
+  "tokens_in": 138068,
+  "tokens_out": 13695,
   "dry_run": false,
   "started": "2026-11-24T11:45:54+00:00",
   "round": 0,
