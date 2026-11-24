@@ -67,8 +67,10 @@ def _run_real(role, cfg, system_prompt, user_prompt, cwd) -> AgentResult:
     tokens_in = sum(u.get(k, 0) or 0 for k in
                     ("input_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"))
     final = (result.result if result else None) or ""
-    # Tags may sit in an earlier message if the last turn was short: fall back to all text.
-    text = final if "<" in final else "\n".join(texts + [final])
+    # Use the final answer. Only if its tags are missing but an earlier message has them
+    # (the model wrote the blocks, then a short "done"), use all text instead.
+    joined = "\n".join(texts)
+    text = joined if ("<" not in final and "<" in joined) or not final.strip() else final
     error = None
     if result is None or result.is_error:
         error = getattr(result, "subtype", None) or "no result"

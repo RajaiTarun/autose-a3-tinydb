@@ -43,7 +43,7 @@ def check_spec(spec: str, judge) -> tuple[bool, str, list[str]]:
         return False, f"ACs not in Given/When/Then form: {', '.join(bad)}", list(acs)
     verdict = judge(spec)
     try:
-        v = json.loads(verdict[verdict.index("{"): verdict.rindex("}") + 1])
+        v, _ = json.JSONDecoder().raw_decode(verdict[verdict.index("{"):])   # first object only
     except (ValueError, json.JSONDecodeError):
         return False, f"Judge returned unparseable output: {verdict[:200]}", list(acs)
     if not v.get("testable"):
