@@ -31,6 +31,7 @@ jobs:
     permissions: {}
     outputs:
       go: ${{ steps.check.outputs.go }}
+      mode: ${{ steps.check.outputs.mode }}
       issue: ${{ steps.check.outputs.issue }}
     steps:
       - id: check
@@ -44,6 +45,7 @@ jobs:
           ISSUE_NUM: ${{ github.event.issue.number || inputs.issue }}
         run: |
           go=false
+          mode=build
           trusted=no
           case "$ASSOC" in OWNER|MEMBER|COLLABORATOR) trusted=yes;; esac
           [ "$SENDER_TYPE" = "Bot" ] && trusted=no
@@ -54,14 +56,18 @@ jobs:
           elif [ "$EVENT" = "issue_comment" ] && [ "$IS_PR" = no ] && [ "$trusted" = yes ] \
                && printf '%s' "$BODY" | head -1 | grep -qE '^/autose(\s|$)'; then
             go=true
+          elif [ "$EVENT" = "issue_comment" ] && [ "$IS_PR" = yes ] && [ "$trusted" = yes ] \
+               && printf '%s' "$BODY" | head -1 | grep -qE '^/autose review(\s|$)'; then
+            go=true; mode=review                      # Reviewer only, on this PR (ADR-010 amendment)
           fi
-          echo "event=$EVENT assoc=$ASSOC sender=$SENDER_TYPE -> go=$go"
+          echo "event=$EVENT assoc=$ASSOC sender=$SENDER_TYPE -> go=$go mode=$mode"
           echo "go=$go" >> "$GITHUB_OUTPUT"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
           echo "issue=$ISSUE_NUM" >> "$GITHUB_OUTPUT"
 
   build:                        # stages 1-5 (ADR-001, ADR-002)
     needs: gate
-    if: needs.gate.outputs.go == 'true'
+    if: needs.gate.outputs.go == 'true' && needs.gate.outputs.mode == 'build'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -106,7 +112,7 @@ jobs:
 
   review:                       # stage 6, independent (ADR-008)
     needs: [gate, build]
-    if: needs.build.outputs.pr != ''
+    if: ${{ !cancelled() && needs.gate.outputs.go == 'true' && (needs.gate.outputs.mode == 'review' || needs.build.outputs.pr != '') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -115,12 +121,13 @@ jobs:
       actions: write            # dispatch the next round
     env:
       ISSUE: ${{ needs.gate.outputs.issue }}
-      PR: ${{ needs.build.outputs.pr }}
+      PR: ${{ needs.build.outputs.pr || needs.gate.outputs.issue }}
+      MODE: ${{ needs.gate.outputs.mode }}
       AUTOSE_DRY_RUN: ${{ vars.AUTOSE_DRY_RUN || 'true' }}
     steps:
       - uses: actions/checkout@v4         # fresh shallow checkout of the PR head; nothing from build
         with:
-          ref: refs/pull/${{ needs.build.outputs.pr }}/head
+          ref: refs/pull/${{ needs.build.outputs.pr || needs.gate.outputs.issue }}/head
           fetch-depth: 1
           persist-credentials: false
       - uses: actions/setup-python@v5
@@ -136,5 +143,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: autose-pr-${{ needs.build.outputs.pr }}-round-${{ inputs.round || '0' }}-review
+          name: autose-pr-${{ needs.build.outputs.pr || needs.gate.outputs.issue }}-round-${{ inputs.round || '0' }}-review
           path: review.md

@@ -282,12 +282,12 @@ def stage_test(st, acs) -> tuple[bool, str]:
     return ok, out
 
 
-def stage_release(st) -> None:
+def stage_release(st, issue) -> None:
     if LOCAL:
         record(st, "release", 1, True, "local mode: release skipped")
         return
     import release
-    release.run(st, ADIR, BRANCH, ISSUE, gh, sh, record, stop)
+    release.run(st, ADIR, BRANCH, ISSUE, issue["title"], gh, sh, record, stop, commit)
 
 
 def reset_code(base: str) -> None:
@@ -330,10 +330,11 @@ def main() -> None:
             else:
                 stop(st, "test", "Retry budget used up. Last failures:\n" + failures[-2000:])
         elif stage == "release":
-            stage_release(st)
+            stage_release(st, issue)
             st["status"] = "released"
-            save_state(st)
-            commit(f"autose(#{ISSUE}): released")
+            save_state(st)          # not committed: see release.py (CI must check the PR head)
+            if LOCAL:
+                commit(f"autose(#{ISSUE}): released")
             print(f"Done. tokens in={st['tokens_in']} out={st['tokens_out']}")
             return
 

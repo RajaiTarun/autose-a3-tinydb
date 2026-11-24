@@ -70,7 +70,7 @@ def _stub_test(prompt, cwd):
 
 def _stub_review(prompt, cwd):
     return AgentResult(
-        "<review>\n# Review (dry run)\nChecklist all pass. Evidence: dry run.\n</review>\n"
+        "<review>\n# Review (dry run)\n- Meets the issue: pass\n- Correctness and edge cases: pass\n- Tests are meaningful: pass\n- Fits ARCHITECTURE.md: pass\n- No unrelated changes: pass\nEvidence: dry run, no real check.\n</review>\n"
         '<verdict>{"verdict": "approve", "target_stage": null, "concerns": []}</verdict>')
 
 
