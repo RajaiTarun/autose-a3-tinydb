@@ -67,6 +67,12 @@ def run(st, adir, branch, issue, issue_title, gh, sh, record, stop, commit) -> N
     record(st, "release", 1, ok, f"PR {url}; CI {info.get('conclusion')} ({info['url']})")
     if not ok:
         stop(st, "release", f"PR {url} is open but CI failed: {info['url']}")
+    # GitHub holds the PR's own pull_request CI run (opened by the bot) until a person
+    # approves it; only that run counts as the required ci-tests check (ADR-002 amendment).
+    gh("pr", "comment", str(pr), "--body",
+       f"AutoSE stage 5: `ci-tests` passed on {head[:7]} ({info['url']}). "
+       "**To merge: a person must click _Approve workflows to run_ on this PR** so the "
+       "required `ci-tests` check is attached. AutoSE never merges.")
     out = os.environ.get("GITHUB_OUTPUT")
     if out:
         with open(out, "a") as f:
