@@ -1,0 +1,7 @@
+diff --git a/tinydb/version.py b/tinydb/version.py
+index 3161916..c4d2428 100644
+--- a/tinydb/version.py
++++ b/tinydb/version.py
+@@ -1 +1,2 @@
+ __version__ = '4.9.0'
++# autose dry-run marker
