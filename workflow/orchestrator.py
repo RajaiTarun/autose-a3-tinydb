@@ -27,6 +27,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import checks  # noqa: E402
+import release  # noqa: E402  (imported before any branch switch: code always from main)
 from agent_runner import DRY_RUN, run_agent  # noqa: E402
 from roles import (MAX_DESIGN_BACKTRACKS, MAX_IMPL_TEST_RETRIES,  # noqa: E402
                    MAX_STAGE_RETRIES)
@@ -307,7 +308,6 @@ def stage_release(st, issue) -> None:
     if LOCAL:
         record(st, "release", 1, True, "local mode: release skipped")
         return
-    import release
     release.run(st, ADIR, BRANCH, ISSUE, issue["title"], gh, sh, record, stop, commit)
 
 
