@@ -1,0 +1,24 @@
+{
+  "issue": "5",
+  "branch": "autose/issue-5",
+  "base_sha": "5011a97cad52965ca873d725026079389715f4fd",
+  "variant": "baseline",
+  "status": "running",
+  "history": [
+    {
+      "stage": "spec",
+      "round": 0,
+      "attempt": 1,
+      "passed": true,
+      "reason": "5 ACs, all Given/When/Then, judged testable.",
+      "time": "2026-11-24T13:08:41+00:00",
+      "tokens_in": 21184,
+      "tokens_out": 2261
+    }
+  ],
+  "tokens_in": 21184,
+  "tokens_out": 2261,
+  "dry_run": false,
+  "started": "2026-11-24T13:08:27+00:00",
+  "round": 0
+}

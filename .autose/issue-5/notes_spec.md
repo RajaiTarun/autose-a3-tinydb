@@ -1,0 +1,5 @@
+- tinydb/operations.py:43 `doc[field] -= abs(n)` is the root cause; abs() forces the subtracted amount to be non-negative.
+- tinydb/operations.py:38-39 docstring says "Subtract ``n`` to a given field" (wording only).
+- docs/usage.rst:316 documents subtract as "subtract value from the value of a key", so plain `-= n` matches the contract.
+- tests/test_operations.py:20-22 covers only a positive amount (5); no negative-amount test exists.
+- Non-regression: keep the positive case (test_subtract) passing when removing abs().
