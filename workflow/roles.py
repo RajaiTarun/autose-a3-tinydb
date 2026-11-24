@@ -14,11 +14,13 @@ RUN_TESTS = ["Bash(pytest:*)", "Bash(python -m pytest:*)", "Bash(python:*)"]
 ROLES = {
     #  role         model    tools                         max_turns
     "spec":      {"model": HAIKU,  "tools": READ_ONLY,                     "max_turns": 8},
-    "judge":     {"model": HAIKU,  "tools": [],                            "max_turns": 1},
+    "judge":     {"model": HAIKU,  "tools": [],                            "max_turns": 1, "effort": "low"},
     "design":    {"model": HAIKU,  "tools": READ_ONLY,                     "max_turns": 12},
-    "implement": {"model": SONNET, "tools": READ_ONLY + EDIT + RUN_TESTS,  "max_turns": 25},
+    "implement": {"model": SONNET, "tools": READ_ONLY + EDIT + RUN_TESTS,  "max_turns": 25,
+                  "effort": "medium"},   # Sonnet defaults to high; medium saves usage
     "test":      {"model": HAIKU,  "tools": READ_ONLY + EDIT + RUN_TESTS,  "max_turns": 20},
-    "review":    {"model": HAIKU,  "tools": READ_ONLY + ["Bash(pytest:*)", "Bash(python -m pytest:*)"],
+    "review":    {"model": HAIKU,  "tools": READ_ONLY + ["Bash(pytest:*)", "Bash(python -m pytest:*)",
+                                                "Bash(python -c:*)"],   # quick checks, read-only checkout
                   "max_turns": 15},
 }
 
