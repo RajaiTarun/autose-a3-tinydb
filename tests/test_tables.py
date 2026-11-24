@@ -197,3 +197,11 @@ def test_persist_empty_does_not_wipe_existing_data(tmpdir):
     assert len(table) == 1
     assert table.all() == [{'a': 1}]
     db.close()
+
+
+def test_clear_field(db):
+    db.insert({'int': 1, 'extra': 'x'})
+    db.clear_field('extra')
+
+    assert all('extra' not in doc for doc in db.all())
+    assert len(db) == 4

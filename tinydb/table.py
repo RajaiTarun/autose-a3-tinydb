@@ -706,6 +706,23 @@ class Table:
         # Reset document ID counter
         self._next_id = None
 
+    def clear_field(self, field: str) -> None:
+        """
+        Remove a field from every document in the table.
+
+        Documents without the field are left unchanged.
+
+        :param field: the name of the field to remove
+        """
+        tables = self._storage.read() or {}
+        table = tables.get(self.name, {})
+
+        for doc in table.values():
+            doc.pop(field, None)
+
+        tables[self.name] = table
+        self._storage.write(tables)
+
     def count(self, cond: QueryLike) -> int:
         """
         Count the documents matching a query.
