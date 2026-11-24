@@ -265,6 +265,10 @@ def stage_implement(st, failures="") -> tuple[bool, str]:
     diff = sh("git", "diff", st["base_sha"], "--", ".", ":(exclude).autose")
     write("diff.patch", diff or "(empty)")
     ok, reason = checks.check_build(REPO, diff)
+    if ok:
+        allowed = ("tinydb/",) + ((f"tests/test_autose_issue_{ISSUE}",) if VARIANT == "no_tester" else ())
+        scope_ok, why = checks.check_scope(diff, allowed)
+        ok, reason = (ok, reason) if scope_ok else (False, why)
     record(st, "implement", attempt, ok, reason, res)
     commit(f"autose(#{ISSUE}): implementation attempt {attempt}")
     return ok, reason
