@@ -90,6 +90,16 @@ def check_design(design: str, repo: Path) -> tuple[bool, str]:
 
 
 # ---------------------------------------------------------------- stage 3
+def check_scope(diff: str, allowed: tuple[str, ...]) -> tuple[bool, str]:
+    """The Implementer may change only these paths (decision 5.2): its Edit tool is not path-limited."""
+    files = re.findall(r"(?m)^diff --git a/(\S+) ", diff)
+    outside = sorted(f for f in files if not f.startswith(allowed))
+    if outside:
+        return False, (f"Changed files outside {', '.join(allowed)}: {', '.join(outside)}. "
+                       "Revert those changes; only the allowed paths may change.")
+    return True, ""
+
+
 def check_build(repo: Path, diff: str) -> tuple[bool, str]:
     if not diff.strip():
         return False, "The implementation produced no code changes."
