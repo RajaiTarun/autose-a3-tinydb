@@ -3,7 +3,7 @@
   "branch": "autose/issue-5",
   "base_sha": "5011a97cad52965ca873d725026079389715f4fd",
   "variant": "baseline",
-  "status": "running",
+  "status": "ci_pending",
   "history": [
     {
       "stage": "spec",
