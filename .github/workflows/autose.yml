@@ -1,0 +1,140 @@
+# AutoSE: issue in, pull request out.
+# Architecture: architecture/views/component.md · Decisions: architecture/decisions/
+#
+# Safety switch: runs are DRY RUNS (stub agents, no Claude usage) unless the
+# repository variable AUTOSE_DRY_RUN is set to "false".
+
+name: autose
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:            # review rounds and experiments (ADR-002)
+    inputs:
+      issue:       { description: "Issue number", required: true }
+      start_stage: { description: "spec | design | implement", required: false, default: "" }
+      round:       { description: "Review round (0 = first pass)", required: false, default: "0" }
+      variant:     { description: "Experiment variant", required: false, default: "baseline" }
+
+permissions: {}                 # nothing by default; each job opts in (ADR-005)
+
+concurrency:                    # one run per issue at a time, queued not cancelled (ADR-010)
+  group: autose-issue-${{ github.event.issue.number || inputs.issue }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions: {}
+    outputs:
+      go: ${{ steps.check.outputs.go }}
+      issue: ${{ steps.check.outputs.issue }}
+    steps:
+      - id: check
+        env:                    # untrusted text only via env, never ${{ }} inside run (ADR-009)
+          EVENT: ${{ github.event_name }}
+          LABEL: ${{ github.event.label.name }}
+          BODY: ${{ github.event.comment.body }}
+          ASSOC: ${{ github.event.comment.author_association }}   # comment author (empty for label events)
+          SENDER_TYPE: ${{ github.event.sender.type }}
+          IS_PR: ${{ github.event.issue.pull_request && 'yes' || 'no' }}
+          ISSUE_NUM: ${{ github.event.issue.number || inputs.issue }}
+        run: |
+          go=false
+          trusted=no
+          case "$ASSOC" in OWNER|MEMBER|COLLABORATOR) trusted=yes;; esac
+          [ "$SENDER_TYPE" = "Bot" ] && trusted=no
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            go=true                                   # only users with write access can dispatch
+          elif [ "$EVENT" = "issues" ] && [ "$LABEL" = "autose" ] && [ "$SENDER_TYPE" != "Bot" ]; then
+            go=true                                   # only triage/write users can add labels
+          elif [ "$EVENT" = "issue_comment" ] && [ "$IS_PR" = no ] && [ "$trusted" = yes ] \
+               && printf '%s' "$BODY" | head -1 | grep -qE '^/autose(\s|$)'; then
+            go=true
+          fi
+          echo "event=$EVENT assoc=$ASSOC sender=$SENDER_TYPE -> go=$go"
+          echo "go=$go" >> "$GITHUB_OUTPUT"
+          echo "issue=$ISSUE_NUM" >> "$GITHUB_OUTPUT"
+
+  build:                        # stages 1-5 (ADR-001, ADR-002)
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write           # push branch autose/issue-N (main is protected)
+      pull-requests: write      # open the PR
+      issues: write             # comment on stop
+      actions: write            # dispatch ci.yml
+    outputs:
+      pr: ${{ steps.orch.outputs.pr }}
+    env:
+      ISSUE: ${{ needs.gate.outputs.issue }}
+      AUTOSE_DRY_RUN: ${{ vars.AUTOSE_DRY_RUN || 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }          # shallow: agents get no git history (ADR-003)
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - name: Refuse paid API keys (decision 1.3)
+        env: { ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}" }
+        run: |
+          if [ -n "$ANTHROPIC_API_KEY" ]; then echo "ANTHROPIC_API_KEY is set; refusing (would be billed)"; exit 1; fi
+      - name: Install
+        run: |
+          pip install -q -e . pytest pytest-cov claude-agent-sdk
+          git config user.name "autose-bot"
+          git config user.email "autose-bot@users.noreply.github.com"
+      - id: orch
+        name: Orchestrator (stages 1-5)
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}    # removed from the agents' env by orchestrator.py
+          START_STAGE: ${{ inputs.start_stage }}
+          ROUND: ${{ inputs.round || '0' }}
+          VARIANT: ${{ inputs.variant || 'baseline' }}
+        run: python workflow/orchestrator.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: autose-issue-${{ env.ISSUE }}-round-${{ inputs.round || '0' }}-build
+          path: .autose/
+          include-hidden-files: true
+
+  review:                       # stage 6, independent (ADR-008)
+    needs: [gate, build]
+    if: needs.build.outputs.pr != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read            # cannot push
+      pull-requests: write      # post the review
+      actions: write            # dispatch the next round
+    env:
+      ISSUE: ${{ needs.gate.outputs.issue }}
+      PR: ${{ needs.build.outputs.pr }}
+      AUTOSE_DRY_RUN: ${{ vars.AUTOSE_DRY_RUN || 'true' }}
+    steps:
+      - uses: actions/checkout@v4         # fresh shallow checkout of the PR head; nothing from build
+        with:
+          ref: refs/pull/${{ needs.build.outputs.pr }}/head
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - run: pip install -q -e . pytest pytest-cov claude-agent-sdk
+      - name: Reviewer
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}    # removed from the agent's env by review.py
+          ROUND: ${{ inputs.round || '0' }}
+          VARIANT: ${{ inputs.variant || 'baseline' }}
+        run: python workflow/review.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: autose-pr-${{ needs.build.outputs.pr }}-round-${{ inputs.round || '0' }}-review
+          path: review.md
