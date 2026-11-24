@@ -211,8 +211,10 @@ def stage_spec(st, issue) -> list[str]:
         write("notes_spec.md", notes)
         if (checks.tag(res.text, "status") or "").lower() == "needs_clarification":
             record(st, "spec", attempt, False, "needs clarification", res)
-            stop(st, "spec", "The request is too ambiguous to specify safely. Open questions are "
-                             "listed in spec.md; please answer them on the issue and re-run.")
+            questions = spec.split("## Open questions", 1)[1].strip() if "## Open questions" in spec else ""
+            stop(st, "spec", "The request is too ambiguous to specify safely. Please answer these "
+                             "questions on the issue and re-run (comment `/autose`):\n\n"
+                             + (questions or "(see spec.md)"))
         judge_res = []
 
         def judge(text):
