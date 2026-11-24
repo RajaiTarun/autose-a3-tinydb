@@ -22,6 +22,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -111,7 +112,16 @@ def commit(msg: str) -> None:
     if sh("git", "status", "--porcelain"):
         sh("git", "commit", "-q", "-m", msg)
         if not LOCAL:
-            sh("git", "push", "-q", "origin", BRANCH)
+            # GitHub can reject a push that follows the previous one within a second
+            # ("missing necessary objects", seen in run 1): wait and retry.
+            for wait in (5, 15, 30, None):
+                try:
+                    sh("git", "push", "-q", "origin", BRANCH)
+                    break
+                except RuntimeError:
+                    if wait is None:
+                        raise
+                    time.sleep(wait)
 
 
 def stop(st: dict, stage: str, reason: str) -> None:
