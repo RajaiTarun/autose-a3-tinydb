@@ -40,7 +40,7 @@ def subtract(field: str, n: Union[int, float]) -> Callable[[MutableMapping], Non
     Subtract ``n`` to a given field in the document.
     """
     def transform(doc: MutableMapping):
-        doc[field] -= abs(n)
+        doc[field] -= n
 
     return transform
 

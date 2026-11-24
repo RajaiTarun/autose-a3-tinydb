@@ -22,6 +22,22 @@ def test_subtract(db):
     assert db.get(where('char') == 'a')['int'] == -4
 
 
+def test_subtract_negative_int(db):
+    db.update(subtract('int', -10), where('char') == 'a')
+    assert db.get(where('char') == 'a')['int'] == 11
+
+
+def test_subtract_negative_float(db):
+    db.update(set('int', 100), where('char') == 'a')
+    db.update(subtract('int', -2.5), where('char') == 'a')
+    assert db.get(where('char') == 'a')['int'] == 102.5
+
+
+def test_subtract_zero(db):
+    db.update(subtract('int', 0), where('char') == 'a')
+    assert db.get(where('char') == 'a')['int'] == 1
+
+
 def test_set(db):
     db.update(set('char', 'xyz'), where('char') == 'a')
     assert db.get(where('char') == 'xyz')['int'] == 1

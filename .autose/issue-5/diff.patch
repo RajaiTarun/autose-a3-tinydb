@@ -1,0 +1,39 @@
+diff --git a/tests/test_operations.py b/tests/test_operations.py
+index 3a6f814..d31b0a4 100644
+--- a/tests/test_operations.py
++++ b/tests/test_operations.py
+@@ -22,6 +22,22 @@ def test_subtract(db):
+     assert db.get(where('char') == 'a')['int'] == -4
+ 
+ 
++def test_subtract_negative_int(db):
++    db.update(subtract('int', -10), where('char') == 'a')
++    assert db.get(where('char') == 'a')['int'] == 11
++
++
++def test_subtract_negative_float(db):
++    db.update(set('int', 100), where('char') == 'a')
++    db.update(subtract('int', -2.5), where('char') == 'a')
++    assert db.get(where('char') == 'a')['int'] == 102.5
++
++
++def test_subtract_zero(db):
++    db.update(subtract('int', 0), where('char') == 'a')
++    assert db.get(where('char') == 'a')['int'] == 1
++
++
+ def test_set(db):
+     db.update(set('char', 'xyz'), where('char') == 'a')
+     assert db.get(where('char') == 'xyz')['int'] == 1
+diff --git a/tinydb/operations.py b/tinydb/operations.py
+index f53c163..3f6c6ab 100644
+--- a/tinydb/operations.py
++++ b/tinydb/operations.py
+@@ -40,7 +40,7 @@ def subtract(field: str, n: Union[int, float]) -> Callable[[MutableMapping], Non
+     Subtract ``n`` to a given field in the document.
+     """
+     def transform(doc: MutableMapping):
+-        doc[field] -= abs(n)
++        doc[field] -= n
+ 
+     return transform
