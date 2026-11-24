@@ -1,0 +1,5 @@
+- Only change: `Query.one_of` in tinydb/queries.py, line 486. Put `self._path` between the tag and `freeze(items)`.
+- Do not touch `_generate_test`, `QueryInstance`, or the cache in table.py (out of scope).
+- Tester: add cross-field cache tests (AC-002, AC-003) that use a fresh `db.search` on a shared table, plus AC-004 to confirm the same-field cache still works.
+- Tester: AC-005 (empty list) and AC-006 (missing field) should pass without code changes; include them to guard against regressions.
+- Implementer: keep the change to one line. Do not refactor the other operators.
