@@ -15,7 +15,10 @@ def run(st, adir, branch, issue, issue_title, gh, sh, record, stop, commit) -> N
     rnd = st.get("round", 0)
     repo_url = f"https://github.com/{os.environ.get('GITHUB_REPOSITORY', '')}"
     report = (adir / "test_report.md").read_text().splitlines()[2] if (adir / "test_report.md").exists() else ""
-    body = (f"Closes #{issue}\n\n"
+    variant = st.get("variant", "baseline")
+    tag = "" if variant == "baseline" else f" [{variant}]"
+    body = ((f"Closes #{issue}\n\n" if variant == "baseline" else
+             f"Experiment variant `{variant}` for #{issue}; not meant to be merged.\n\n")
             f"Opened by the AutoSE workflow (round {rnd}). **A person decides whether to merge; "
             f"AutoSE never merges.**\n\n"
             f"| Stage | Artifact |\n|---|---|\n"
@@ -39,7 +42,7 @@ def run(st, adir, branch, issue, issue_title, gh, sh, record, stop, commit) -> N
         gh("pr", "edit", str(pr), "--body-file", str(adir / "pr.md"))
     else:
         url = gh("pr", "create", "--base", "main", "--head", branch,
-                 "--title", f"AutoSE #{issue}: {issue_title}"[:120],
+                 "--title", f"AutoSE #{issue}{tag}: {issue_title}"[:120],
                  "--body-file", str(adir / "pr.md"))
         pr = int(url.rstrip("/").split("/")[-1])
 

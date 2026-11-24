@@ -38,7 +38,8 @@ START = os.environ.get("START_STAGE") or "spec"
 ROUND = int(os.environ.get("ROUND") or 0)
 VARIANT = os.environ.get("VARIANT") or "baseline"
 LOCAL = os.environ.get("AUTOSE_LOCAL", "").lower() in ("1", "true", "yes")
-BRANCH = f"autose/issue-{ISSUE}"
+# Experiment variants get their own branch, so the baseline PR stays untouched (decision 5.4).
+BRANCH = f"autose/issue-{ISSUE}" + (f"-{VARIANT}" if VARIANT != "baseline" else "")
 ADIR = REPO / ".autose" / f"issue-{ISSUE}"
 
 # ADR-005: take the token out of the environment so no agent subprocess inherits it.

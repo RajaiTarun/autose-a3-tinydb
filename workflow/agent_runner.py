@@ -105,6 +105,8 @@ def _stub_design(prompt, cwd):
 def _stub_implement(prompt, cwd):
     f = Path(cwd) / "tinydb" / "version.py"
     f.write_text(f.read_text() + "# autose dry-run marker\n")
+    if "Also write the tests yourself" in prompt:      # no_tester variant
+        _stub_test(prompt, cwd)
     return AgentResult("<notes>Appended a comment to tinydb/version.py.</notes>")
 
 
