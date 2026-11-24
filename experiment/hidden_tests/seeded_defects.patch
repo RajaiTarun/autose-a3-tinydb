@@ -1,0 +1,26 @@
+diff --git a/tinydb/operations.py b/tinydb/operations.py
+index 3f6c6ab..f53c163 100644
+--- a/tinydb/operations.py
++++ b/tinydb/operations.py
+@@ -40,7 +40,7 @@ def subtract(field: str, n: Union[int, float]) -> Callable[[MutableMapping], Non
+     Subtract ``n`` to a given field in the document.
+     """
+     def transform(doc: MutableMapping):
+-        doc[field] -= n
++        doc[field] -= abs(n)
+ 
+     return transform
+ 
+diff --git a/tinydb/queries.py b/tinydb/queries.py
+index e106c5d..3d0efbd 100644
+--- a/tinydb/queries.py
++++ b/tinydb/queries.py
+@@ -483,7 +483,7 @@ class Query(QueryInstance):
+         """
+         return self._generate_test(
+             lambda value: value in items,
+-            ('one_of', self._path, freeze(items))
++            ('one_of', freeze(items))
+         )
+ 
+     def fragment(self, document: Mapping) -> QueryInstance:

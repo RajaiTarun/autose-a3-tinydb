@@ -1,0 +1,46 @@
+# CI for the AutoSE fork of tinydb.
+#
+# Runs the full tinydb test suite on Python 3.13 (decision 1.6).
+#
+# Triggers:
+#   - pull_request into main: PRs opened by people.
+#   - workflow_dispatch: PRs opened by the AutoSE workflow. GitHub does not start
+#     other workflows for events caused by GITHUB_TOKEN, so the release stage (stage 5)
+#     starts this workflow itself with `gh workflow run ci.yml --ref <branch>` and
+#     waits for the result (decision 1.6).
+#
+# The job name `ci-tests` is a required status check in the `protect-main`
+# ruleset, so no PR can be merged into main while it is red.
+
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ci-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install tinydb and its dev dependencies (pinned by uv.lock)
+        run: uv sync --python 3.13 --group dev
+
+      - name: Run the full test suite
+        run: uv run --python 3.13 pytest -q
