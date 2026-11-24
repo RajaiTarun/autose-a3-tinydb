@@ -4,7 +4,7 @@ An agentic SDLC workflow built on GitHub Actions. A maintainer adds the `autose`
 issue, and a set of agents turns it into a tested pull request reviewed by an
 independent agent. **A person makes the final merge decision; AutoSE never merges.**
 
-Report: [`report.pdf`](report.pdf) · Runs: [`results/runs.md`](results/runs.md) · Data: [`results/results.csv`](results/results.csv) · Demo video: DEMO_LINK
+Report: [`report.pdf`](report.pdf) · Runs: [`results/runs.md`](results/runs.md) · Data: [`results/results.csv`](results/results.csv) · Demo video: [Google Drive](https://drive.google.com/file/d/1AssBfn_ZS91tnLomPmt22f9BzpWvbG1d/view?usp=sharing)
 
 ## Subject
 
